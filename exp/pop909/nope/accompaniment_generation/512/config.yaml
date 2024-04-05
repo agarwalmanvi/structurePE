@@ -1,0 +1,55 @@
+datamodule:
+  root: ../../data/pop909_C/data
+  batch_size: 8
+  num_workers: 8
+  shuffle: False
+  use_test_set: False
+  sample_lengths: 0.5,0.5,0.5
+  task: accompaniment_generation
+  pytorch_dataset:
+    train:
+      include_versions: False
+      shuffle_seed: 100
+    val:
+      include_versions: False
+      shuffle_seed: 101
+    test:
+      include_versions: False
+      shuffle_seed: 102
+
+model:
+  d_in: 256
+  d_out: 128
+  d_model: 512
+  max_len: &max_len 512
+  add_positional_encoding: False
+  decoder:
+    n_layer: 2
+    n_head: 4
+    d_ff: 512
+    batch_first: True
+  lr: 5.0e-5
+  schedulers:
+    - scheduler:
+        class: !!python/name:torch.optim.lr_scheduler.StepLR
+        step_size: 1
+        gamma: 0.85
+        verbose: True
+      interval: epoch
+      frequency: 1
+    - scheduler:
+        class: !!python/name:structure_pe.lr_scheduler.LinearWarmupLR
+        warmup_steps: 160
+      interval: step
+      frequency: 1
+  length_curriculum:
+    steps: 2875
+    min: 16
+    max: *max_len
+
+seed: 0
+trainer:
+  max_epochs: 15
+  log_every_n_steps: 25
+  val_check_interval: 0.05
+  gradient_clip_val: 0.0005
