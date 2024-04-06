@@ -41,10 +41,9 @@ def main():
 
     neptune_run = neptune.init_run(
         # change this to your project
-        project = "manvi/binarization",
         # project = "username/project",
         name = args.name or args.model_dir,
-        mode="debug",
+        # mode="debug",
         source_files = []
     )
     neptune_run['config'] = cfg.get()
